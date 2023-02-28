@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>复杂电磁环境仿真选项卡</title>
+	<link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css"/>
+	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="echarts/dist/echarts.min.js" type="text/javascript"></script>
+	<script src="js/srcForm.js" type="text/javascript"></script>
+	<script src="js/srcFrequency.js" type="text/javascript"></script>
+	<script src="js/generateMap.js " type="text/javascript"></script>
+	<script src="js/srcPointer.js" type="text/javascript"></script>
+	<script src="js/text.js" type="text/javascript"></script>
+</head>
+<style>
+	body {
+		background-color: azure;
+	}
+
+	.power {
+		width: 80px;
+		height: 30px;
+	}
+
+	.navbar {
+		background-color: azure;
+	}
+
+	.btn-group {
+		margin-top: -10px;
+	}
+
+	.table {
+		margin-top: 5px;
+	}
+
+	.srcName {
+		margin-top: 5px;
+	}
+
+	th, td {
+		text-align: center;
+	}
+
+	.freMinIn, .freMaxIn, .pwrIn, .selIn {
+		width: 80px;
+		height: 30px;
+	}
+
+	.freView {
+		width: 200px;
+		height: 30px;
+		margin-left: 60px;
+	}
+</style>
+<body>
+
+<!-- 标题 -->
+<div class="container" style="text-align: center">
+	<h4>
+		<!--设置图片与文本对齐-->
+		<!--        <div class="media-left">-->
+		<img style="width: 40px;height: 40px;" src="./img/nwu.png">
+		复杂电磁环境下的无线网络数据传输仿真平台
+		<!--        </div>-->
+	</h4>
+</div>
+</div><!-- /.container -->
+<!-- 导航条 -->
+<nav class="navbar navbar-default">
+	<div class="container">
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li><a href="#">开始 <span class="sr-only">(current)</span></a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+					   aria-expanded="false">选项卡 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="#">复杂电磁环境仿真</a></li>
+						<li><a href="transform.html" target="_self">无线网络数据传输</a></li>
+					</ul>
+				</li>
+				<li><a href="#">设置</a></li>
+				<li><a href="#">关于</a></li>
+				<li><a href="javascript:history.back();">返回上一页</a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+<div class="container" style="margin-top: -15px">
+	<!-- 模态框（添加辐射源） -->
+	<div class=" modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;
+					</button>
+					<h4 class="modal-title" id="myModalLabel">电磁源辐射数量</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="srcNum" class="col-md-3 control-label col-md-offset-2">数量</label>
+							<div class="col-md-3">
+								<div class="input-group">
+									<input id="srcNum" type="number" class="form-control">
+									<span class="input-group-addon">个</span>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="submit"
+							data-dismiss="modal">提交
+					</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!--模态框（确定删除）-->
+	<div class=" modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		 aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;
+					</button>
+					<h4 class="modal-title" id="delModalLabel">确定删除？</h4>
+				</div>
+				<div class="modal-body">
+					<div style="text-align: center">
+						<button type="button" class="btn btn-primary " id="ensureDel"
+								data-dismiss="modal">确定
+						</button>
+						<button type="button" class="btn btn-default " data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<div class=" panel panel-default">
+		<div class="panel-heading" style="text-align:center "> 辐射源信息</div>
+		<div class="panel-body">
+			<!-- 设置电磁辐射数量（<=4个） -->
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-info btn-sm" id="addSrc">
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 辐射源
+				</button>
+				<button type="button" class="btn btn-info btn-sm" id="delSrc">
+					<span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 辐射源
+				</button>
+			</div>
+			<!-- 辐射源列表 -->
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered">
+					<thead>
+					<tr>
+						<th class="col-xs-1">选中/未选中</th>
+						<th class="col-md-1">名称</th>
+						<th class="col-md-1">最小频率(MHz)</th>
+						<th class="col-md-1">最大频率(MHz)</th>
+						<th class="col-md-1">信号类型</th>
+						<th class="col-md-2">辐射功率(dB)</th>
+						<th class="col-md-3">频谱图</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>
+							<input class="srcCheck checkbox-inline" type="checkbox" checked="checked"/>
+						</td>
+						<td>
+							<div class="srcName">辐射源1</div>
+						</td>
+						<td>
+							<input type="number" class="freMinIn">
+						</td>
+						<td>
+							<input type="number" class="freMaxIn">
+						</td>
+						<td>
+							<select id="" class="selIn">
+								<option>正弦波</option>
+								<option>三角波</option>
+								<option>方波</option>
+							</select>
+						</td>
+						<td>
+							<input type="number" class="pwrIn col-md-1 col-md-push-1">
+							<div class="power col-md-1 col-md-push-2"></div>
+						</td>
+						<td>
+							<div class="freView"></div>
+							<!--                            <button class="viewPopover btn-sm btn-link" data-toggle="popover">查看</button>-->
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<hr style="margin-top: -10px">
+			<div style="text-align:center; margin-top: -10px "> 信道衰落模型仿真</div>
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active"><a href="#largeFade" aria-controls="largeFade" role="tab"
+														  data-toggle="tab">大尺度衰落模型</a></li>
+				<li role="presentation"><a href="#smallFade" aria-controls="smallFade" role="tab"
+										   data-toggle="tab">小尺度衰落模型</a></li>
+			</ul>
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="largeFade">
+					<div id='largeQu' style="height:600px;margin-left:20px;"></div>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="smallFade">
+					<div id='smallQu' style="height:600px;margin-left:20px;"></div>
+				</div>
+			</div>
+		</div> <!-- panel body -->
+	</div> <!-- panel -->
+</div> <!-- container -->
+<script type="text/javascript">
+	//动态生成辐射源表格
+	createTable()
+	//引入地图
+	getMapBySvg('largeQu', 'SVG/Sicily topographic blank map.svg', 'large')
+	getMapByJson('smallQu', 'json/map/hkMap.json', 'small')
+	showMap()
+</script>
+</body>
+</html>
